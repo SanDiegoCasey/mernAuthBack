@@ -34,6 +34,7 @@ router.post('/register', function(req,res) {
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
+        img: req.body.img,
         avatar
       });
 
@@ -71,24 +72,29 @@ router.post('/login', (req, res) => {
     .then(user => {
       if(!user) {
         errors.email = 'User not found';
-        return res.statue(404).json(errors);
+        return res.status(404).json(errors);
       }
       bcrypt.compare(password, user.password)
         .then(isMatch => {
           if(isMatch) {
             const payload = {
-              id: user.id,
+              id: user._id,
               name: user.name,
-              avatar: user.avatar
+              avatar: user.avatar,
+              img: user.img
             };
             jwt.sign(payload, config.JWT_SECRET, {
-              expiresIn: config.JWT_EXPIRY
-            }, (err, token) => {
+              expiresIn: config.JWT_EXPIRY,
+              algorithm: 'HS256'
+            }, (err, token, id, name) => {
               if(err) console.error('There is some error in token', err);
               else {
                 res.json({
                   success: true,
-                  token:`${token}`
+                  token:`${token}`,
+                  name: payload.name,
+                  userId: payload.id,
+                  img: payload.img
                 });
               }
             });
