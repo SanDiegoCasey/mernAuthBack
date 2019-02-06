@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const validateRegisterInput = require('../validation/register');
 const validateLoginInput = require('../validation/login');
+const config = require('../config');
 
 const User = require('../models/User');
 
@@ -80,14 +81,14 @@ router.post('/login', (req, res) => {
               name: user.name,
               avatar: user.avatar
             };
-            jwt.sign(payload, 'secret', {
-              expiresIn: 3600
+            jwt.sign(payload, config.JWT_SECRET, {
+              expiresIn: config.JWT_EXPIRY
             }, (err, token) => {
               if(err) console.error('There is some error in token', err);
               else {
                 res.json({
                   success: true,
-                  token:`Bearer ${token}`
+                  token:`${token}`
                 });
               }
             });
